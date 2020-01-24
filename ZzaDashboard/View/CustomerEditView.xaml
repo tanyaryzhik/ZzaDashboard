@@ -8,9 +8,9 @@
              mc:Ignorable="d"
              d:DesignHeight="300"
              d:DesignWidth="300">
-  <UserControl.DataContext>
+  <!--<UserControl.DataContext>
     <ViewModel:CustomerEditViewModel/>
-  </UserControl.DataContext>
+  </UserControl.DataContext>-->
     <Grid HorizontalAlignment="Left"
               Margin="10,10,0,0"
               VerticalAlignment="Top">
@@ -37,7 +37,7 @@
                      Grid.Row="0"
                      VerticalAlignment="Center"
                      Width="120" 
-                 Text="{Binding Customer.FirstName}"/>
+                 Text="{Binding FirstName}"/>
         <Label Content="Last Name:"
                    Grid.Column="0"
                    HorizontalAlignment="Left"
@@ -51,7 +51,7 @@
                      Grid.Row="1"
                      VerticalAlignment="Center"
                      Width="120" 
-                 Text="{Binding Customer.LastName}"/>
+                 Text="{Binding LastName}"/>
         <Label Content="Phone:"
                    Grid.Column="0"
                    HorizontalAlignment="Left"
@@ -65,7 +65,7 @@
                      Grid.Row="2"
                      VerticalAlignment="Center"
                      Width="120"
-                 Text="{Binding Customer.Phone}"/>
+                 Text="{Binding Phone}"/>
         <StackPanel Grid.Row="3"
                         Grid.Column="0"
                         Grid.ColumnSpan="2"

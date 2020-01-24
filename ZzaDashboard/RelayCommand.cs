@@ -7,100 +7,77 @@ namespace ZzaDashboard
 {
     public class RelayCommand : ICommand
     {
-        Action _TargetExecuteMethod;
-        Func<bool> _TargetCanExecuteMethod;
+        private Predicate<object> canExecute;
 
-        public RelayCommand(Action executeMethod)
+        private event EventHandler CanExecuteChangedInternal;
+
+        private Action<object> execute;
+
+        private static bool DefaultCanExecute(object parameter)
         {
-            _TargetExecuteMethod = executeMethod;
+            return true;
         }
 
-        public RelayCommand(Action executeMethod, Func<bool> canExecuteMethod)
+        public void Destroy()
         {
-            _TargetExecuteMethod = executeMethod;
-            _TargetCanExecuteMethod = canExecuteMethod;
+            this.canExecute = _ => false;
+            this.execute = _ => { return; };
         }
 
-        public void RaiseCanExecuteChanged()
+        public void Execute(object parameter)
         {
-            CanExecuteChanged(this, EventArgs.Empty);
+            this.execute(parameter);
         }
-        #region ICommand Members
 
-        bool ICommand.CanExecute(object parameter)
+        public bool CanExecute(object parameter)
         {
-            if (_TargetCanExecuteMethod != null)
+            return this.canExecute != null && this.canExecute(parameter);
+        }
+
+        public event EventHandler CanExecuteChanged
+        {
+            add
             {
-                return _TargetCanExecuteMethod();
+                CommandManager.RequerySuggested += value;
+                this.CanExecuteChangedInternal += value;
             }
-            if (_TargetExecuteMethod != null)
-            {
-                return true;
-            }
-            return false;
-        }
 
-        // Beware - should use weak references if command instance lifetime is longer than lifetime of UI objects that get hooked up to command
-        // Prism commands solve this in their implementation
-        public event EventHandler CanExecuteChanged = delegate { };
-
-        void ICommand.Execute(object parameter)
-        {
-            if (_TargetExecuteMethod != null)
+            remove
             {
-                _TargetExecuteMethod();
+                CommandManager.RequerySuggested -= value;
+                this.CanExecuteChangedInternal -= value;
             }
         }
-        #endregion
-    }
 
-    public class RelayCommand<T> : ICommand
-    {
-        Action<T> _TargetExecuteMethod;
-        Func<T, bool> _TargetCanExecuteMethod;
-
-        public RelayCommand(Action<T> executeMethod)
+        public void OnCanExecuteChanged()
         {
-            _TargetExecuteMethod = executeMethod;
-        }
-
-        public RelayCommand(Action<T> executeMethod, Func<T, bool> canExecuteMethod)
-        {
-            _TargetExecuteMethod = executeMethod;
-            _TargetCanExecuteMethod = canExecuteMethod;
-        }
-
-        public void RaiseCanExecuteChanged()
-        {
-            CanExecuteChanged(this, EventArgs.Empty);
-        }
-        #region ICommand Members
-
-        bool ICommand.CanExecute(object parameter)
-        {
-            if (_TargetCanExecuteMethod != null)
+            EventHandler handler = this.CanExecuteChangedInternal;
+            if (handler != null)
             {
-                T tparm = (T)parameter;
-                return _TargetCanExecuteMethod(tparm);
-            }
-            if (_TargetExecuteMethod != null)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        // Beware - should use weak references if command instance lifetime is longer than lifetime of UI objects that get hooked up to command
-        // Prism commands solve this in their implementation
-        public event EventHandler CanExecuteChanged = delegate { };
-
-        void ICommand.Execute(object parameter)
-        {
-            if (_TargetExecuteMethod != null)
-            {
-                _TargetExecuteMethod((T)parameter);
+                //DispatcherHelper.BeginInvokeOnUIThread(() => handler.Invoke(this, EventArgs.Empty));
+                handler.Invoke(this, EventArgs.Empty);
             }
         }
-        #endregion
+
+        public RelayCommand(Action<object> execute)
+            : this(execute, DefaultCanExecute)
+        {
+        }
+
+        public RelayCommand(Action<object> execute, Predicate<object> canExecute)
+        {
+            if (execute == null)
+            {
+                throw new ArgumentNullException("execute");
+            }
+
+            if (canExecute == null)
+            {
+                throw new ArgumentNullException("canExecute");
+            }
+
+            this.execute = execute;
+            this.canExecute = canExecute;
+        }
     }
 }
