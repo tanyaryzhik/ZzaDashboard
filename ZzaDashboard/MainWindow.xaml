@@ -17,7 +17,15 @@
     <viewModel:MainWindowViewModel/>
   </Window.DataContext>
   <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
         <!--<ListView ItemsSource="{Binding Customers}" ItemTemplate="{StaticResource CustomerView}">-->
-        <ListView ItemsSource="{Binding Customers}"/>
+        <ListView Grid.Column="0"
+                  ItemsSource="{Binding Customers}"
+                  SelectedItem="{Binding SelectedCustomer}"/>
+        <view:CustomerEditView Grid.Column="1"
+                               DataContext="{Binding SelectedCustomer}"/>
     </Grid>
 </Window>

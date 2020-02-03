@@ -12,8 +12,22 @@ namespace ZzaDashboard.ViewModel
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<Customer> Customers { get; set; }
+        private ObservableCollection<Customer> customers;
+
+        public ObservableCollection<Customer> Customers
+        {
+            get { return this.customers; }
+            set
+            {
+                if (this.customers == value)
+                    return;
+
+                this.customers = value;
+                this.OnPropertyChanged(nameof(this.Customers));
+            }
+        }
         private ICustomersRepository Repository { get; set; }
+
         private Customer customer;
         public Customer Customer
         {
@@ -25,6 +39,20 @@ namespace ZzaDashboard.ViewModel
 
                 this.customer = value;
                 this.OnPropertyChanged(nameof(this.Customer));
+            }
+        }
+
+        private Customer selectedCustomer;
+        public Customer SelectedCustomer
+        {
+            get { return this.selectedCustomer; }
+            set
+            {
+                if (this.selectedCustomer == value)
+                    return;
+
+                this.selectedCustomer = value;
+                this.OnPropertyChanged(nameof(this.SelectedCustomer));
             }
         }
         public MainWindowViewModel()
